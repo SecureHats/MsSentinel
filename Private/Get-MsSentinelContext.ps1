@@ -1,10 +1,3 @@
-param(
-    [Parameter(Mandatory=$true)]$ResourceGroup,
-    [Parameter(Mandatory=$true)]$Workspace,    
-    [Parameter(Mandatory=$true)]$Location
-)
-
-
 function CheckModules($module) {
     $installedModule = Get-InstalledModule -Name $module -ErrorAction SilentlyContinue
     if ($null -eq $installedModule) {

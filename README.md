@@ -18,7 +18,7 @@ Also trying to avoid any dependencies on PowerShell modules where possible witho
 - [ ] Enable rules from Rule Templates
 - [ ] Compare analytics rules
 
-## Remarks:
+## Feeback, Feature Requests and Issues:
 
 Please feel free to post any feedback of feature requests for this new module by creating an issue [Create Issue](https://github.com/SecureHats/MsSentinel/issues)
 

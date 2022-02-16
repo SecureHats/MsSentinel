@@ -4,4 +4,4 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 # SecureHats Repo Template
 
-This SecureHats repository is used to organize project information and artifacts. 
+This SecureHats repository contains the development of the new Microsoft Sentinel PowerShell module. 

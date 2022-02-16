@@ -48,7 +48,7 @@ Path to the CSV file containing the watchlist content.
 
   begin {
         Get-MsSentinelContext
-        Get-MsSentinelWorkspace
+        Get-MsSentinelWorkspace -WorkspaceName $WorkspaceName
     }
   process {
     if ($null -ne $workspace) {

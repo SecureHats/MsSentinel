@@ -21,7 +21,6 @@ Path to the CSV file containing the watchlist content.
    New-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -WatchlistName 'MyWatchlist' -AliasName 'MyWatchlist' -itemsSearchKey 'Assets'-csvFile "\examples\examples.csv"
 #>
 
-
   [cmdletbinding(SupportsShouldProcess)]
   param
   (

@@ -2,51 +2,50 @@
 #requires -version 6.2
 
 function New-MsSentinelWatchlist {
-  [CmdletBinding()]
-  [Alias()]
-  Param
+  <#
+.Synopsis
+   Create a Microsoft Sentinel Watchlist
+.DESCRIPTION
+   This function can be used to create a Microsoft Sentinel watchlist with content from a csv file.
+.PARAMETER WorkspaceName
+Enter the Workspace name
+.PARAMETER WatchlistName
+Enter the displayName of the watchlist
+.PARAMETER AliasName
+Enter the aliasname for the watchlist
+.PARAMETER ItemsSearchKey
+Column name used for indexing. The column should contain unique values
+.PARAMETER csvFile
+Path to the CSV file containing the watchlist content.
+.EXAMPLE
+   New-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -WatchlistName 'MyWatchlist' -AliasName 'MyWatchlist' -itemsSearchKey 'Assets'-csvFile "\examples\examples.csv"
+#>
+
+
+  [cmdletbinding(SupportsShouldProcess)]
+  param
   (
-      # Graph access token
       [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
+      [ValidateNotNullOrEmpty()]
       [string]$WorkspaceName,
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 1)]
+      [ValidateNotNullOrEmpty()]
       [string]$WatchlistName,
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 2)]
+      [ValidateNotNullOrEmpty()]
       [string]$AliasName,
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 3)]
+      [ValidateNotNullOrEmpty()]
       [string]$itemsSearchKey,
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $false, Position = 4)]
+      [ValidateNotNullOrEmpty()]
       [ValidateScript( { (Test-Path -Path $_) -and ($_.Extension -in '.csv') })]
       [System.IO.FileInfo]$csvFile
   )
-
-  $context = Get-AzContext
-
-  if (!$context) {
-      Connect-AzAccount -UseDeviceAuthentication
-      $context = Get-AzContext
-  }
-
-  $_context = @{
-      'Account'         = $($context.Account)
-      'Subscription Id' = $context.Subscription
-      'Tenant'          = $context.Tenant
-  }
-
-  $logo = "
-       _____                           __  __      __
-      / ___/___  _______  __________  / / / /___ _/ / ____
-      \__ \/ _ \/ ___/ / / / ___/ _ \/ /_/ / __ `/ __/ ___/
-     ___/ /  __/ /__/ /_/ / /  /  __/ __  / /_/ / /_(__  )
-    /____/\___/\___/\__,_/_/   \___/_/ /_/\__,_/\__/____/ `n`n"
-
-  Clear-Host
-  Write-Host $logo -ForegroundColor White
-  Write-Output "Connected to Azure with subscriptionId: $($context.Subscription)`n"
 
   $workspace = Get-AzResource -Name $WorkspaceName -ResourceType 'Microsoft.OperationalInsights/workspaces'
 
@@ -58,8 +57,6 @@ function New-MsSentinelWatchlist {
   else {
       Write-Output "[-] Unable to retrieve log Analytics workspace"
   }
-
-  Write-Verbose ($_context | ConvertTo-Json)
 
   if ($null -ne $csvFile) {
       try {
@@ -114,7 +111,7 @@ function New-MsSentinelWatchlist {
   }
   catch {
       Write-Verbose $_
-      Write-Error "Unable to create warchlist with error code: $($_.Exception.Message)" -ErrorAction Stop
+      Write-Error "Unable to create watchlist with error code: $($_.Exception.Message)" -ErrorAction Stop
   }
   Write-Output "[+] Post any feature requests or issues on https://github.com/SecureHats/SecureHacks/issues`n"
 }

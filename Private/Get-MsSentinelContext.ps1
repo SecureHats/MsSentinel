@@ -37,7 +37,7 @@ $context = Get-AzContext
 
 if(!$context){
     Connect-AzAccount
-    $context = Get-AzContext
+    $script:context = Get-AzContext
 }
 
 $script:SubscriptionId = $context.Subscription.Id

@@ -23,14 +23,20 @@ function CheckModules($module) {
     #Import-Module will bring the module and its functions into your current powershell session, if the module is installed.  
 }
 
-CheckModules("Az.Resources")
-CheckModules("Az.OperationalInsights")
+function Get-MsSentinelContext {
 
-$context = Get-AzContext
+    begin {
+        CheckModules("Az.Resources")
+        CheckModules("Az.OperationalInsights")
+    }
+    process {
+        $context = Get-AzContext
 
-if(!$context){
-    Connect-AzAccount
-    $script:context = Get-AzContext
+        if (!$context) {
+            $null = Connect-AzAccount
+            $script:context = Get-AzContext
+        }
+
+        $script:SubscriptionId = $context.Subscription.Id
+    }
 }
-
-$script:SubscriptionId = $context.Subscription.Id

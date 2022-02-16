@@ -14,14 +14,14 @@ Enter the Workspace name
 .PARAMETER AliasName
 Enter the aliasname for the watchlist
 .EXAMPLE
-Returns a watchlist from a workspace
 Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -AliasName 'MyWatchlist'
+Returns a watchlist from a workspace
 .EXAMPLE
-Returns all watchlists in a workspace
 Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace'
+Returns all watchlists in a workspace
 .EXAMPLE
-Returns all watchlists in a workspace in a specific resource group
 Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -ResourceGroupName 'MyResourceGroup'
+Returns all watchlists in a workspace in a specific resource group
 #>
 
     [cmdletbinding(SupportsShouldProcess)]

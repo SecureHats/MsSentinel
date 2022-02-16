@@ -23,4 +23,4 @@ Also trying to avoid any dependencies on PowerShell modules where possible witho
 Please feel free to post any feedback of feature requests for this new module by creating an issue [Create Issue](https://github.com/SecureHats/MsSentinel/issues)
 
 ## Link to backlog
-[Prjoect Backlog](https://github.com/SecureHats/MsSentinel/projects/1)
+[Project Backlog](https://github.com/SecureHats/MsSentinel/projects/1)

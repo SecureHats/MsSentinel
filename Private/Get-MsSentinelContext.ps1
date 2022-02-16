@@ -22,8 +22,8 @@ function CheckModules($module) {
         else {
             #Admin, install to all users
             Write-Warning -Message "Installing the $module module to all users"
-            Install-Module -Name $module -Force
-            Import-Module -Name $module -Force
+            Install-Module -Name $module -Repository PSGallery -Force
+            Import-Module -Name $module -Repository PSGallery -Force
         }
     }
     #Install-Module will obtain the module from the gallery and install it on your local machine, making it available for use.
@@ -32,12 +32,6 @@ function CheckModules($module) {
 
 CheckModules("Az.Resources")
 CheckModules("Az.OperationalInsights")
-CheckModules("Az.SecurityInsights")
-CheckModules("Az.MonitoringSolutions")
-
-Write-Host "`r`nIf not logged in to Azure already, you will now be asked to log in to your Azure environment. `nFor this script to work correctly, you need to provide credentials of a Global Admin or Security Admin for your organization. `nThis will allow the script to enable all required connectors.`r`n" -BackgroundColor Magenta
-
-Read-Host -Prompt "Press enter to continue or CTRL+C to quit the script" 
 
 $context = Get-AzContext
 

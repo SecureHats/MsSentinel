@@ -24,13 +24,13 @@ Enter the Subscription Id of the workspace
       [string]$WorkspaceName
   )
       
-      try {
-        $script:workspace = Get-AzResource -Name $WorkspaceName -ResourceType 'Microsoft.OperationalInsights/workspaces'
-        if ($null -eq $workspace) {
-          Write-Error "Unable to get Log Analytics workspace"
-        }
-      }
-      catch {
-        Write-Error "Unable to get the Log Analytics workspace"
-      }
+  try {
+    $script:workspace = Get-AzResource -Name $WorkspaceName -ResourceType 'Microsoft.OperationalInsights/workspaces'
+    if ($null -eq $workspace) {
+      Write-Error "Unable to get Log Analytics workspace"
+    }
+  }
+  catch {
+    Write-Error "Unable to get the Log Analytics workspace"
+  }
 }

@@ -1,5 +1,7 @@
 function CheckModules($module) {
+
     $installedModule = Get-InstalledModule -Name $module -ErrorAction SilentlyContinue
+
     if ($null -eq $installedModule) {
         Write-Warning "The $module PowerShell module is not found"
         #check for Admin Privleges
@@ -19,8 +21,6 @@ function CheckModules($module) {
             Import-Module -Name $module -Repository PSGallery -Force
         }
     }
-    #Install-Module will obtain the module from the gallery and install it on your local machine, making it available for use.
-    #Import-Module will bring the module and its functions into your current powershell session, if the module is installed.  
 }
 
 function Get-MsSentinelContext {

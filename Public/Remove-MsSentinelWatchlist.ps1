@@ -26,28 +26,30 @@ function Remove-MsSentinelWatchlist {
     )
 
     begin {
-        Get-MsSentinelContext
-        Get-MsSentinelWorkspace -WorkspaceName $WorkspaceName
+        try {
+            Get-MsSentinelContext
+            Get-MsSentinelWorkspace -WorkspaceName $WorkspaceName
+        }
+        catch {
+            Write-Error $_.Exception.Message
+        }
     }
     process {
         if ($null -ne $workspace) {
             $apiVersion = '?api-version=2021-09-01-preview'
             $baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
             $resourcePath = '{0}/watchlists/{1}{2}' -f $baseUri, $AliasName, $apiVersion
-        }
-        else {
+        } else {
             Write-Output "[-] Unable to to get Log Analytics workspace"
         }
 
         $_resource = Invoke-AzRestMethod -Path $resourcePath
-        if ($null -ne $_resource) {
-            try {
+
+        if ($_resource.StatusCode -eq 200) {
                 Write-Verbose "[-] Found watchlist with name [$($AliasName)]."
-            }
-            catch {
-                Write-Error 'Unable to retrieve the watchlist'
-                exit
-            }
+        } else {
+            Write-Output '[-] Unable to retrieve the watchlist'
+            break
         }
 
         try {
@@ -56,12 +58,12 @@ function Remove-MsSentinelWatchlist {
                 Write-Verbose "[-] Resource with name $($AliasName) has been removed."
             }
             else {
-                Write-Output $result | ConvertFrom-Json
+                Write-Output "[-] $(($result.Content | ConvertFrom-Json).error.message)"
             }
         }
         catch {
             Write-Verbose $_
-            Write-Error "Unable to remove the resource with error code: $($_.Exception.Message)" -ErrorAction Stop
+            Write-Error "[-] Unable to remove the resource with error code: $($_.Exception.Message)" -ErrorAction Stop
         }
         Write-Verbose "[+] Post any feature requests or issues on https://github.com/SecureHats/SecureHacks/issues`n"
     }

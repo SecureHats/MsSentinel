@@ -106,6 +106,7 @@ Path to the CSV file containing the watchlist content.
         if ($result.StatusCode -eq 200) {
             Write-Output "[+] Watchlist with alias [$($AliasName)] has been created."
             Write-Output "[+] It can take a while before the results are visible in Log Analytics.`n"
+            return $true
         }
         else {
             Write-Output $result | ConvertFrom-Json

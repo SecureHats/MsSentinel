@@ -22,23 +22,30 @@ function Get-MsSentinelWorkspace {
         [ValidateNotNullOrEmpty()]
         [string]$WorkspaceName,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 0)]
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 1)]
         [string]$ResourceGroupName
     )
 
-    try {
-        $argHash = @{
-            Name = $WorkspaceName
-            ResourceType = 'Microsoft.OperationalInsights/workspaces'
-        }
+    begin {
+        if (!($context)) { Get-MsSentinelContext }
+    }
+    process {
+        try {
+            $argHash = @{
+                Name         = $WorkspaceName
+                ResourceType = 'Microsoft.OperationalInsights/workspaces'
+            }
 
-        if ($ResourceGroupName) { $argHash.resourceGroupName = $ResourceGroupName }
-        $script:workspace = Get-AzResource @argHash
-        if ($null -eq $workspace) {
-            Write-Output "Unable to get Log Analytics workspace"
-            break
+            if ($ResourceGroupName) { $argHash.resourceGroupName = $ResourceGroupName }
+            $script:workspace = Get-AzResource @argHash
+            $script:baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
+            if ($null -eq $workspace) {
+                Write-Output "Unable to get Log Analytics workspace"
+                break
+            }
         }
-    } catch {
-        Write-Error "Unexpected Error in function [Get-MsSentinelWorkspace]"
+        catch {
+            Write-Error "Unexpected Error in function [Get-MsSentinelWorkspace]"
+        }
     }
 }

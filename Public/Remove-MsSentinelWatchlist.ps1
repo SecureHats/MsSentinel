@@ -22,12 +22,12 @@ function Remove-MsSentinelWatchlist {
 
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [string]$AliasName
+        [string]$WatchlistAlias
     )
 
     begin {
         try {
-            Get-MsSentinelContext
+            if (!($context)) { Get-MsSentinelContext }
             Get-MsSentinelWorkspace -WorkspaceName $WorkspaceName
         }
         catch {
@@ -37,8 +37,7 @@ function Remove-MsSentinelWatchlist {
     process {
         if ($null -ne $workspace) {
             $apiVersion = '?api-version=2021-09-01-preview'
-            $baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
-            $resourcePath = '{0}/watchlists/{1}{2}' -f $baseUri, $AliasName, $apiVersion
+            $resourcePath = '{0}/watchlists/{1}{2}' -f $baseUri, $WatchlistAlias, $apiVersion
         } else {
             Write-Output "[-] Unable to to get Log Analytics workspace"
         }
@@ -46,7 +45,7 @@ function Remove-MsSentinelWatchlist {
         $_resource = Invoke-AzRestMethod -Path $resourcePath
 
         if ($_resource.StatusCode -eq 200) {
-                Write-Verbose "[-] Found watchlist with name [$($AliasName)]."
+                Write-Verbose "[-] Found watchlist with name [$($WatchlistAlias)]."
         } else {
             Write-Output '[-] Unable to retrieve the watchlist'
             break
@@ -55,14 +54,13 @@ function Remove-MsSentinelWatchlist {
         try {
             $result = Invoke-AzRestMethod -Path $resourcePath -Method DELETE
             if ($result.StatusCode -eq 200) {
-                Write-Verbose "[-] Resource with name $($AliasName) has been removed."
+                Write-Verbose "[-] Resource with name $($WatchlistAlias) has been removed."
             }
             else {
                 Write-Output "[-] $(($result.Content | ConvertFrom-Json).error.message)"
             }
         }
         catch {
-            Write-Verbose $_
             Write-Error "[-] Unable to remove the resource with error code: $($_.Exception.Message)" -ErrorAction Stop
         }
         Write-Verbose "[+] Post any feature requests or issues on https://github.com/SecureHats/SecureHacks/issues`n"

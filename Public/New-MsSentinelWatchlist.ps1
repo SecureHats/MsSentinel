@@ -11,14 +11,14 @@ function New-MsSentinelWatchlist {
 Enter the Workspace name
 .PARAMETER WatchlistName
 Enter the displayName of the watchlist
-.PARAMETER AliasName
-Enter the aliasname for the watchlist
+.PARAMETER WatchlistAlias
+Enter the WatchlistAlias for the watchlist
 .PARAMETER ItemsSearchKey
 Column name used for indexing. The column should contain unique values
 .PARAMETER csvFile
 Path to the CSV file containing the watchlist content.
 .EXAMPLE
-   New-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -WatchlistName 'MyWatchlist' -AliasName 'MyWatchlist' -itemsSearchKey 'Assets'-csvFile "\examples\examples.csv"
+   New-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -WatchlistName 'MyWatchlist' -WatchlistAlias 'MyWatchlist' -itemsSearchKey 'Assets'-csvFile "\examples\examples.csv"
 #>
 
   [cmdletbinding(SupportsShouldProcess)]
@@ -34,7 +34,7 @@ Path to the CSV file containing the watchlist content.
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 2)]
       [ValidateNotNullOrEmpty()]
-      [string]$AliasName,
+      [string]$WatchlistAlias,
 
       [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 3)]
       [ValidateNotNullOrEmpty()]
@@ -47,14 +47,14 @@ Path to the CSV file containing the watchlist content.
   )
 
   begin {
-        Get-MsSentinelContext
+    if (!($context)) { Get-MsSentinelContext }
         Get-MsSentinelWorkspace -WorkspaceName $WorkspaceName
     }
   process {
     if ($null -ne $workspace) {
         $apiVersion = '?api-version=2021-09-01-preview'
         $baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
-        $watchlist = '{0}/watchlists/{1}{2}' -f $baseUri, $AliasName, $apiVersion
+        $watchlist = '{0}/watchlists/{1}{2}' -f $baseUri, $WatchlistAlias, $apiVersion
     }
     else {
         Write-Output "[-] Unable to retrieve log Analytics workspace"
@@ -104,17 +104,15 @@ Path to the CSV file containing the watchlist content.
     try {
         $result = Invoke-AzRestMethod -Path $watchlist -Method PUT -Payload ($argHash | ConvertTo-Json)
         if ($result.StatusCode -eq 200) {
-            Write-Output "[+] Watchlist with alias [$($AliasName)] has been created."
+            Write-Output "[+] Watchlist with alias [$($WatchlistAlias)] has been created."
             Write-Output "[+] It can take a while before the results are visible in Log Analytics.`n"
             return $true
-        }
-        else {
-            Write-Output $result | ConvertFrom-Json
+        } else {
+            Write-Error ($result.Content | ConvertFrom-Json).error.Message
         }
     }
     catch {
-        Write-Verbose $_
-        Write-Error "Unable to create watchlist with error code: $($_.Exception.Message)" -ErrorAction Stop
+        Write-Error "[-] Unable to create the resource with error code: $($_.Exception.Message)" -ErrorAction Stop
     }
       Write-Output "[+] Post any feature requests or issues on https://github.com/SecureHats/SecureHacks/issues`n"
   }

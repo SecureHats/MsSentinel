@@ -34,9 +34,14 @@ function Get-MsSentinelContext {
 
         if (!$context) {
             $null = Connect-AzAccount
-            $script:context = Get-AzContext
-        }
 
-        $script:SubscriptionId = $context.Subscription.Id
+            $subscriptions = Get-AzSubscription
+            if ($null -ne $subscriptions) {
+                $script:context = Get-AzContext
+                $script:SubscriptionId = $context.Subscription.Id
+            } else {
+                Write-Output 'No Azure subscriptions found in the current context'
+            }
+        }
     }
 }

@@ -11,10 +11,10 @@ function Get-MsSentinelWatchlist {
 Enter the Workspace name
 .PARAMETER ResourceGroupName
 Enter the Workspace name
-.PARAMETER AliasName
-Enter the aliasname for the watchlist
+.PARAMETER WatchlistAlias
+Enter the WatchlistAlias for the watchlist
 .EXAMPLE
-Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -AliasName 'MyWatchlist'
+Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace' -WatchlistAlias 'MyWatchlist'
 Returns a watchlist from a workspace
 .EXAMPLE
 Get-MsSentinelWatchlist -WorkspaceName 'MyWorkspace'
@@ -36,7 +36,7 @@ Returns all watchlists in a workspace in a specific resource group
 
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [string]$AliasName,
+        [string]$WatchlistAlias,
 
         [Parameter(Mandatory = $false)]
         [string]$ApiVersion = '2021-09-01-preview'
@@ -48,14 +48,13 @@ Returns all watchlists in a workspace in a specific resource group
         }
         if ($ResourceGroupName) { $argHash.ResourceGroupName = $ResourceGroupName }
 
-        Get-MsSentinelContext
+        if (!($context)) { Get-MsSentinelContext }
         Get-MsSentinelWorkspace @argHash
     }
     process {
         if ($null -ne $workspace) {
             $_apiVersion = '?api-version={0}' -f $ApiVersion
-            $baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
-            $watchlistUri = '{0}/watchlists/{1}{2}' -f $baseUri, $AliasName, $_apiVersion
+            $watchlistUri = '{0}/watchlists/{1}{2}' -f $baseUri, $WatchlistAlias, $_apiVersion
         }
         else {
             Write-Output "Unable to retrieve Log Analytics workspace [$($WorkspaceName)]"
@@ -66,7 +65,7 @@ Returns all watchlists in a workspace in a specific resource group
             $result = Invoke-AzRestMethod -Path $watchlistUri -Method GET
 
             if ($result.StatusCode -eq 200) {
-                if ($AliasName) {
+                if ($WatchlistAlias) {
                     $watchlist = ($result.Content | ConvertFrom-Json).properties
                 } else {
                     $watchlist = ($result.Content | ConvertFrom-Json).value.properties
@@ -77,7 +76,7 @@ Returns all watchlists in a workspace in a specific resource group
             }
         }
         catch {
-            Write-Error "Unable to get the watchlist with error code: $($_.Exception.Message)" -ErrorAction Stop
+            Write-Error "Unable to get the resource with error code: $($_.Exception.Message)" -ErrorAction Stop
         }
         Write-Output "`n[+] Post any feature requests or issues on https://github.com/SecureHats/SecureHacks/issues`n"
     }

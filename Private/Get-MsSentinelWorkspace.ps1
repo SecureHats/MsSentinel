@@ -31,17 +31,23 @@ function Get-MsSentinelWorkspace {
     }
     process {
         try {
-            $argHash = @{
-                Name         = $WorkspaceName
-                ResourceType = 'Microsoft.OperationalInsights/workspaces'
-            }
-
-            if ($ResourceGroupName) { $argHash.resourceGroupName = $ResourceGroupName }
-            $script:workspace = Get-AzResource @argHash
-            $script:baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
-            if ($null -eq $workspace) {
-                Write-Output "Unable to get Log Analytics workspace"
+            if ($baseUri -and ($baseUri -like "*$WorkspaceName*")){
+                Write-Verbose "Current selected Workspace is [$($WorkspaceName)]"
                 break
+            }
+            else {
+                $argHash = @{
+                    Name         = $WorkspaceName
+                    ResourceType = 'Microsoft.OperationalInsights/workspaces'
+                }
+
+                if ($ResourceGroupName) { $argHash.resourceGroupName = $ResourceGroupName }
+                $script:workspace = Get-AzResource @argHash
+                $script:baseUri = '{0}/providers/Microsoft.SecurityInsights' -f $workspace.ResourceId
+                if ($null -eq $workspace) {
+                    Write-Output "Unable to get Log Analytics workspace"
+                    break
+                }
             }
         }
         catch {
